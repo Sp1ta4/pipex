@@ -6,16 +6,16 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 16:56:56 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/01 16:24:33 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/03 10:15:36 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static char *ft_getenv(char **envp)
+static char	*ft_getenv(char **envp)
 {
 	int	i;
-	
+
 	i = 0;
 	while (envp[i])
 	{
@@ -60,12 +60,12 @@ static int	ft_getcommands(char *arg, char ***commands)
 
 	splitted = ft_split(arg, ' ');
 	if (!splitted)
-		return (0);	
+		return (0);
 	(*commands)[0] = ft_strdup(splitted[0]);
 	if (splitted[1])
-		(*commands)[1] =  ft_strdup(splitted[1]);
+		(*commands)[1] = ft_strdup(splitted[1]);
 	else
-		(*commands)[1] = NULL;	
+		(*commands)[1] = NULL;
 	if (!(*commands)[0] || (splitted[1] && !(*commands)[1]))
 	{
 		free((*commands)[0]);
@@ -77,11 +77,11 @@ static int	ft_getcommands(char *arg, char ***commands)
 	return (1);
 }
 
-char **ft_get_command_path(char *argv, char **envp)
+char	**ft_get_command_path(char *argv, char **envp)
 {
 	char	*env;
 	char	**commands;
-	
+
 	env = ft_getenv(envp);
 	if (!env)
 		return (NULL);
