@@ -1,3 +1,5 @@
-$ echo "Hello World" > testfile
-$ ./pipex testfile "cat" "grep Hello" outfile
-$ cat outfile
+Hello
+World
+Pipex is good!
+Hello
+Worlddd

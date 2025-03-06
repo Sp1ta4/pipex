@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 16:56:56 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/03 10:15:36 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/06 14:26:01 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,16 @@ static int	ft_getcommands(char *arg, char ***commands)
 	}
 	free_split(splitted);
 	return (1);
+}
+
+void	print_before_space(char *str)
+{
+	while (*str && !ft_isspace(*str))
+	{
+		write(2, str, 1);
+		str++;
+	}
+	write(1, "\n", 1);
 }
 
 char	**ft_get_command_path(char *argv, char **envp)

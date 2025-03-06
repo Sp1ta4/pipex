@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 13:49:54 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/03 12:53:39 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/06 14:31:54 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,27 +17,23 @@ static void	do_first_command(char *file, char *cmd, char **envp, int chan[2])
 	char	**commands;
 	int		fd;
 
-	printf("%s\n", file);
 	fd = open(file, O_RDONLY);
-	printf("%d\n", fd);
 	if (fd == -1)
 	{
 		perror(file);
 		exit(1);
 	}
 	dup2(fd, 0);
-	printf("%d, %d\n", chan[0], chan[1]);
 	dup2(chan[1], 1);
 	close(chan[0]);
 	close(chan[1]);
 	close(fd);
 	commands = ft_get_command_path(cmd, envp);
-	printf("%s, %s\n", commands[0], commands[1]);
 	if (!commands)
 	{
-    	write(2, "command not found: ", 20);
-		write(2, cmd, ft_strlen(cmd));
-    	exit(127);
+		write(2, "command not found: ", 20);
+		print_before_space(cmd);
+		exit(127);
 	}
 	execve(commands[0], commands, envp);
 	perror(commands[0]);
@@ -45,21 +41,22 @@ static void	do_first_command(char *file, char *cmd, char **envp, int chan[2])
 	exit(127);
 }
 
-static void	do_command(char *cmd, char **envp, int inner_chan[2], int outter_chan[2])
+static void	do_command(char *cmd, char **envp, int i_chan[2], int o_chan[2])
 {
 	char	**commands;
 
-	dup2(inner_chan[0], 0);
-	dup2(outter_chan[1], 1);
-	close(inner_chan[0]);
-	close(inner_chan[1]);
-	close(outter_chan[1]);
+	dup2(i_chan[0], 0);
+	dup2(o_chan[1], 1);
+	close(i_chan[0]);
+	close(i_chan[1]);
+	close(o_chan[1]);
 	commands = ft_get_command_path(cmd, envp);
 	if (!commands)
 	{
-    	write(2, "command not found: ", 20);
-		write(2, cmd, ft_strlen(cmd));
-    	exit(127);
+		write(2, "command not found: ", 20);
+		print_before_space(cmd);
+		write(2, "\n", 1);
+		exit(127);
 	}
 	execve(commands[0], commands, envp);
 	perror(commands[0]);
@@ -85,9 +82,10 @@ static void	do_last_command(char *file, char *cmd, char **envp, int chan[2])
 	commands = ft_get_command_path(cmd, envp);
 	if (!commands)
 	{
-    	write(2, "command not found: ", 20);
-    	write(2, cmd, ft_strlen(cmd));
-    	exit(127);
+		write(2, "command not found: ", 20);
+		print_before_space(cmd);
+		write(2, "\n", 1);
+		exit(127);
 	}
 	execve(commands[0], commands, envp);
 	perror(commands[0]);
@@ -123,32 +121,32 @@ static void	create_process(pid_t *fid)
 		exit(1);
 	}
 }
-
 void	run_processes(int argc, char **argv, char **envp)
 {
 	pid_t	pid[argc - 2];
-	int		channels[argc - 3][2];
+	int		chan[argc - 3][2];
 	int		i;
 
-	create_channels(channels, argc - 3);
+	// allocate_pid(&pid, argc - 2);            // Выделение памяти для pid
+	// allocate_channels(&chan, argc - 3);      // Выделение памяти для каналов
+	create_channels(chan, argc - 3);         // Создание каналов
 	i = -1;
-	printf("------> %d\n", argc);
 	while (++i < argc - 2)
 	{
-		create_process(&pid[i]);
-		if (pid[i] == 0)
+		create_process(&pid[i]);  // Создание процесса
+		if (pid[i] == 0) // В дочернем процессе
 		{
 			if (i == 0)
-			{
-				printf("======================> %s, %s\n", argv[0], argv[1]);
-				do_first_command(argv[0], argv[1], envp, channels[0]);
-			}
+				do_first_command(argv[0], argv[1], envp, chan[0]);
 			else if (i == argc - 3)
-				do_last_command(argv[i + 1], argv[i], envp, channels[i - 1]);		
+				do_last_command(argv[i + 2], argv[i + 1], envp, chan[i - 1]);
 			else
-				do_command(argv[i + 1], envp, channels[i - 1], channels[i]);
+				do_command(argv[i + 1], envp, chan[i - 1], chan[i]);
 		}
+		else
+			close(chan[i][1]); // Закрытие записи в канале родительским процессом
 	}
-	while (wait(NULL) > 0)
-		;
+	// free_resources(pid, chan, argc - 3);
+	exit(wait_and_return_status(pid, argc - 2));
 }
+
