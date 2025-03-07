@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 13:48:34 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/06 14:12:07 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/07 16:45:01 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	free_ptr(void **p)
 	}
 }
 
-void	free_split(char **arr)
+void	free_pointers_arr(int **arr)
 {
 	int	i;
 
@@ -41,40 +41,17 @@ void	free_split(char **arr)
 	free(arr);
 }
 
-void	free_list(t_stack *list)
-{
-	t_stack	*tmp;
-
-	while (list)
-	{
-		tmp = list->next;
-		free(list);
-		list = tmp;
-	}
-}
-
-int	wait_and_return_status(int *pid, int len)
+void	free_split(char **arr)
 {
 	int	i;
-	int	last_status;
-	int	status;
-	int	exit_status;
 
-	i = -1;
-	last_status = 0;
-	while (++i < len)
+	if (!arr)
+		return ;
+	i = 0;
+	while (arr[i])
 	{
-		waitpid(pid[i], &status, 0);
-		if (WIFEXITED(status))
-		{
-			exit_status = WEXITSTATUS(status);
-			if (exit_status != 0)
-				last_status = exit_status;
-		}
-		else if (WIFSIGNALED(status))
-		{
-			last_status = 128 + WTERMSIG(status);
-		}
+		free(arr[i]);
+		i++;
 	}
-	return (last_status);
+	free(arr);
 }

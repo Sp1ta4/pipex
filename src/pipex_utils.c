@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 16:56:56 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/06 14:26:01 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:22:29 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,20 +77,18 @@ static int	ft_getcommands(char *arg, char ***commands)
 	return (1);
 }
 
-void	print_before_space(char *str)
+void	free_commands(char **commands)
 {
-	while (*str && !ft_isspace(*str))
-	{
-		write(2, str, 1);
-		str++;
-	}
-	write(1, "\n", 1);
+	free(commands[0]);
+	free(commands[1]);
+	free(commands);
 }
 
 char	**ft_get_command_path(char *argv, char **envp)
 {
 	char	*env;
 	char	**commands;
+	char	*correct_path;
 
 	env = ft_getenv(envp);
 	if (!env)
@@ -103,13 +101,14 @@ char	**ft_get_command_path(char *argv, char **envp)
 		free(commands);
 		return (NULL);
 	}
-	commands[0] = take_correct_path(commands[0], env);
-	if (!commands[0])
+	correct_path = take_correct_path(commands[0], env);
+	if (!correct_path)
 	{
-		free(commands[1]);
-		free(commands);
+		free_commands(commands);
 		return (NULL);
 	}
+	free(commands[0]);
+	commands[0] = correct_path;
 	commands[2] = NULL;
 	return (commands);
 }
