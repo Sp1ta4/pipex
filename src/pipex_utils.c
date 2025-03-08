@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 16:56:56 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/07 17:22:29 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/09 17:22:20 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,13 @@ static char	*take_correct_path(char *command, char *path)
 	char	*tmp;
 	char	*tmp2;
 
-	i = 0;
+	i = -1;
+	if (access(command, X_OK) == 0)
+		return (ft_strdup(command));
 	paths = ft_split(path, ':');
 	if (!paths)
 		return (NULL);
-	while (paths[i] != NULL)
+	while (paths[++i] != NULL)
 	{
 		tmp = ft_strjoin(paths[i], "/");
 		tmp2 = ft_strjoin(tmp, command);
@@ -48,7 +50,6 @@ static char	*take_correct_path(char *command, char *path)
 			return (tmp2);
 		}
 		free(tmp2);
-		i++;
 	}
 	free_split(paths);
 	return (NULL);

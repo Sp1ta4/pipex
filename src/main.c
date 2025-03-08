@@ -6,36 +6,49 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 16:28:03 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/07 19:42:44 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/09 18:34:49 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	do_here_doc(char *limiter)
+static void	exit_print_model(void)
 {
-	
-}
+	const char	*msg1;
+	const char	*msg2;
 
+	msg1 = "Error: Insufficient arguments.\n";
+	msg2 = "Usage: ./pipex infile command1 command2 outfile\n";
+	write(2, msg1, ft_strlen(msg1));
+	write(2, msg2, ft_strlen(msg2));
+	exit(2);
+}
 
 int	main(int argc, char **argv, char **envp)
 {
-	int	is_here_doc;
-	int	infile;
+	int			is_here_doc;
+	int			infile;
+	t_cmd_info	cmd_info;
 
 	if (argc && argv)
 	{
-		is_here_doc = argv[1] == "here_doc";
+		is_here_doc = !ft_strncmp(argv[1], "here_doc", 8);
 		if (argc < 5)
-			exit(2);
+			exit_print_model();
+		cmd_info.argv = argv;
+		cmd_info.is_hd = is_here_doc;
 		if (is_here_doc)
-		{
 			infile = do_here_doc(argv[2]);
-			argv[2] = infile;
-			run_processes(argc - 1, argv + 2, envp);
-		}
 		else
-			run_processes(argc - 1, argv + 1, envp);
+			infile = open(argv[1], O_RDONLY);
+		if (infile == -1)
+		{
+			perror(argv[1]);
+			exit(1);
+		}
+		dup2(infile, 0);
+		close(infile);
+		check_heredoc_and_run(argc, cmd_info, envp);
 	}
 	return (0);
 }

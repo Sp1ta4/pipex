@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 13:34:46 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/07 17:09:49 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/09 18:38:25 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,31 +38,31 @@ void	close_all_pipes(int **chan, int total_cmds)
 	}
 }
 
-void	run_processes(int argc, char **argv, char **envp)
+void	run_processes(int cmd_count, t_cmd_info cmd_info, char **envp)
 {
 	pid_t	*pid;
 	int		**chan;
 	int		status;
 	int		i;
 
-	allocate_pid(&pid, argc - 2);
-	create_channels(&chan, argc - 3);
+	allocate_pid(&pid, cmd_count);
+	create_channels(&chan, cmd_count - 1);
 	i = -1;
-	while (++i < argc - 2)
+	while (++i < cmd_count)
 	{
 		create_process(&pid[i]);
 		if (pid[i] == 0)
 		{
-			close_unused_pipes(chan, i, argc - 2);
+			close_unused_pipes(chan, i, cmd_count);
 			if (i == 0)
-				do_first_command(argv[0], argv[1], envp, chan[0]);
-			else if (i == argc - 3)
-				do_last_command(argv[i + 2], argv[i + 1], envp, chan[i - 1]);
+				do_first_command(cmd_info.argv[0], envp, chan[0]);
+			else if (i == cmd_count - 1)
+				do_last_command(cmd_info, i, envp, chan[i - 1]);
 			else
-				do_command(argv[i + 1], envp, chan[i - 1], chan[i]);
+				do_command(cmd_info.argv[i], envp, chan[i - 1], chan[i]);
 		}
 	}
-	status = wait_and_return_status(pid, chan, argc - 2);
-	free_resources(pid, chan, argc - 3);
+	status = wait_and_return_status(pid, chan, cmd_count);
+	free_resources(pid, chan, cmd_count - 1);
 	exit(status);
 }
