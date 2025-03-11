@@ -6,7 +6,7 @@
 /*   By: ggevorgi <sp1tak.gg@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 16:28:03 by ggevorgi          #+#    #+#             */
-/*   Updated: 2025/03/09 18:34:49 by ggevorgi         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:34:50 by ggevorgi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc && argv)
 	{
-		is_here_doc = !ft_strncmp(argv[1], "here_doc", 8);
 		if (argc < 5)
 			exit_print_model();
+		is_here_doc = !ft_strncmp(argv[1], "here_doc", 8);
 		cmd_info.argv = argv;
 		cmd_info.is_hd = is_here_doc;
 		if (is_here_doc)
